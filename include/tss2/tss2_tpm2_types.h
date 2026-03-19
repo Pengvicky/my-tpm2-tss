@@ -15,18 +15,18 @@
 
 #include <stdint.h>
 
-#define TPM2_MAX_COMMAND_SIZE  4096 /* maximum size of a command */
-#define TPM2_MAX_RESPONSE_SIZE 4096 /* maximum size of a response */
+#define TPM2_MAX_COMMAND_SIZE  65000 /* maximum size of a command */
+#define TPM2_MAX_RESPONSE_SIZE 65000 /* maximum size of a response */
 
 /* TPM constants for buffer sizes */
 #define TPM2_NUM_PCR_BANKS      16
-#define TPM2_MAX_DIGEST_BUFFER  1024
+#define TPM2_MAX_DIGEST_BUFFER  65000
 #define TPM2_MAX_NV_BUFFER_SIZE 2048
 #define TPM2_MAX_PCRS           32
 #define TPM2_MAX_ALG_LIST_SIZE  128
 #define TPM2_MAX_CAP_CC         256
 #define TPM2_MAX_CAP_BUFFER     1024
-#define TPM2_MAX_CONTEXT_SIZE   5120
+#define TPM2_MAX_CONTEXT_SIZE   65000
 
 /* Hash algorithm sizes */
 #define TPM2_SHA_DIGEST_SIZE     20
@@ -114,8 +114,14 @@ typedef UINT16 TPM2_ALG_ID;
 #define TPM2_ALG_CBC            ((TPM2_ALG_ID)0x0042)
 #define TPM2_ALG_CFB            ((TPM2_ALG_ID)0x0043)
 #define TPM2_ALG_ECB            ((TPM2_ALG_ID)0x0044)
+
+#define TPM2_ALG_SCLOUDPLUS_L1  ((TPM2_ALG_ID)0x88A0)
+#define TPM2_ALG_SCLOUDPLUS_L3  ((TPM2_ALG_ID)0x88A1)
+#define TPM2_ALG_SCLOUDPLUS_L5  ((TPM2_ALG_ID)0x88A2)
+#define TPM2_ALG_AIGIS_SIG      ((TPM2_ALG_ID)0x88A3)
+
 #define TPM2_ALG_FIRST          ((TPM2_ALG_ID)0x0001)
-#define TPM2_ALG_LAST           ((TPM2_ALG_ID)0x0044)
+#define TPM2_ALG_LAST           ((TPM2_ALG_ID)0x88A3)
 
 /* From TCG Algorithm Registry: Definition of TPM2_ECC_CURVE Constants */
 typedef UINT16 TPM2_ECC_CURVE;
@@ -253,7 +259,9 @@ typedef UINT32 TPM2_CC;
 #define TPM2_CC_ACT_SetTimeout             ((TPM2_CC)0x00000198)
 #define TPM2_CC_ECC_Encrypt                ((TPM2_CC)0x00000199)
 #define TPM2_CC_ECC_Decrypt                ((TPM2_CC)0x0000019a)
-#define TPM2_CC_LAST                       ((TPM2_CC)0x0000019a)
+#define TPM2_CC_Encapsulate                ((TPM2_CC)0x000001a0)
+#define TPM2_CC_Decapsulate                ((TPM2_CC)0x000001a1)
+#define TPM2_CC_LAST                       ((TPM2_CC)0x000001a1)
 #define TPM2_CC_Vendor_TCG_Test            ((TPM2_CC)0x20000000)
 
 /* Definition of Types for Documentation Clarity */
@@ -2527,8 +2535,11 @@ union TPMU_PUBLIC_ID {
     TPM2B_DIGEST         keyedHash;
     TPM2B_DIGEST         sym;
     TPM2B_PUBLIC_KEY_RSA rsa;
+
     TPMS_ECC_POINT       ecc;
+    TPM2B_MAX_BUFFER         kem;
     TPMS_DERIVE          derive;
+
 };
 
 /* Definition of TPMS_KEYEDHASH_PARMS Structure */

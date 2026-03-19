@@ -982,7 +982,23 @@ TPMU_MARSHAL2(TPMU_PUBLIC_ID,
               TPM2_ALG_ECC,
               ADDR,
               ecc,
-              Tss2_MU_TPMS_ECC_POINT_Marshal)
+              Tss2_MU_TPMS_ECC_POINT_Marshal,
+              TPM2_ALG_SCLOUDPLUS_L1,
+              ADDR,
+              kem,
+              Tss2_MU_TPM2B_MAX_BUFFER_Marshal,
+              TPM2_ALG_SCLOUDPLUS_L3,
+              ADDR,
+              kem,
+              Tss2_MU_TPM2B_MAX_BUFFER_Marshal,
+              TPM2_ALG_SCLOUDPLUS_L5,
+              ADDR,
+              kem,
+              Tss2_MU_TPM2B_MAX_BUFFER_Marshal,
+              TPM2_ALG_AIGIS_SIG,
+              ADDR,
+              kem,
+              Tss2_MU_TPM2B_MAX_BUFFER_Marshal)
 TPMU_UNMARSHAL2(TPMU_PUBLIC_ID,
                 TPM2_ALG_KEYEDHASH,
                 keyedHash,
@@ -995,7 +1011,34 @@ TPMU_UNMARSHAL2(TPMU_PUBLIC_ID,
                 Tss2_MU_TPM2B_PUBLIC_KEY_RSA_Unmarshal,
                 TPM2_ALG_ECC,
                 ecc,
-                Tss2_MU_TPMS_ECC_POINT_Unmarshal)
+                Tss2_MU_TPMS_ECC_POINT_Unmarshal,
+                TPM2_ALG_SCLOUDPLUS_L1,
+                kem,
+                Tss2_MU_TPM2B_MAX_BUFFER_Unmarshal,
+                TPM2_ALG_SCLOUDPLUS_L3,
+                kem,
+                Tss2_MU_TPM2B_MAX_BUFFER_Unmarshal,
+                TPM2_ALG_SCLOUDPLUS_L5,
+                kem,
+                Tss2_MU_TPM2B_MAX_BUFFER_Unmarshal,
+                TPM2_ALG_AIGIS_SIG,
+                kem,
+                Tss2_MU_TPM2B_MAX_BUFFER_Unmarshal)
+
+
+TSS2_RC Tss2_MU_TPMS_ASYM_PARMS_Marshal(TPMS_ASYM_PARMS const *src, uint8_t buffer[], size_t buffer_size, size_t *offset) {
+    TSS2_RC ret;
+    ret = Tss2_MU_TPMT_SYM_DEF_OBJECT_Marshal(&src->symmetric, buffer, buffer_size, offset);
+    if (ret != TSS2_RC_SUCCESS) return ret;
+    return Tss2_MU_TPMT_ASYM_SCHEME_Marshal(&src->scheme, buffer, buffer_size, offset);
+}
+
+TSS2_RC Tss2_MU_TPMS_ASYM_PARMS_Unmarshal(uint8_t const buffer[], size_t buffer_size, size_t *offset, TPMS_ASYM_PARMS *dest) {
+    TSS2_RC ret;
+    ret = Tss2_MU_TPMT_SYM_DEF_OBJECT_Unmarshal(buffer, buffer_size, offset, dest ? &dest->symmetric : NULL);
+    if (ret != TSS2_RC_SUCCESS) return ret;
+    return Tss2_MU_TPMT_ASYM_SCHEME_Unmarshal(buffer, buffer_size, offset, dest ? &dest->scheme : NULL);
+}
 
 TPMU_MARSHAL2(TPMU_PUBLIC_PARMS,
               TPM2_ALG_KEYEDHASH,
@@ -1013,7 +1056,23 @@ TPMU_MARSHAL2(TPMU_PUBLIC_PARMS,
               TPM2_ALG_ECC,
               ADDR,
               eccDetail,
-              Tss2_MU_TPMS_ECC_PARMS_Marshal)
+              Tss2_MU_TPMS_ECC_PARMS_Marshal,
+              TPM2_ALG_SCLOUDPLUS_L1,
+              ADDR,
+              asymDetail,
+              Tss2_MU_TPMS_ASYM_PARMS_Marshal,
+              TPM2_ALG_SCLOUDPLUS_L3,
+              ADDR,
+              asymDetail,
+              Tss2_MU_TPMS_ASYM_PARMS_Marshal,
+              TPM2_ALG_SCLOUDPLUS_L5,
+              ADDR,
+              asymDetail,
+              Tss2_MU_TPMS_ASYM_PARMS_Marshal,
+              TPM2_ALG_AIGIS_SIG,
+              ADDR,
+              asymDetail,
+              Tss2_MU_TPMS_ASYM_PARMS_Marshal)
 TPMU_UNMARSHAL2(TPMU_PUBLIC_PARMS,
                 TPM2_ALG_KEYEDHASH,
                 keyedHashDetail,
@@ -1026,7 +1085,19 @@ TPMU_UNMARSHAL2(TPMU_PUBLIC_PARMS,
                 Tss2_MU_TPMS_RSA_PARMS_Unmarshal,
                 TPM2_ALG_ECC,
                 eccDetail,
-                Tss2_MU_TPMS_ECC_PARMS_Unmarshal)
+                Tss2_MU_TPMS_ECC_PARMS_Unmarshal,
+                TPM2_ALG_SCLOUDPLUS_L1,
+                asymDetail,
+                Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
+                TPM2_ALG_SCLOUDPLUS_L3,
+                asymDetail,
+                Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
+                TPM2_ALG_SCLOUDPLUS_L5,
+                asymDetail,
+                Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
+                TPM2_ALG_AIGIS_SIG,
+                asymDetail,
+                Tss2_MU_TPMS_ASYM_PARMS_Unmarshal)
 
 TPMU_MARSHAL2(TPMU_NAME,
               sizeof(TPM2_HANDLE),
