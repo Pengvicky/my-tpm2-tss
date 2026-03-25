@@ -289,7 +289,7 @@ TPM2B_MARSHAL(TPM2B_ID_OBJECT);
 TPM2B_UNMARSHAL(TPM2B_ID_OBJECT, credential);
 TPM2B_MARSHAL(TPM2B_CONTEXT_SENSITIVE);
 TPM2B_UNMARSHAL(TPM2B_CONTEXT_SENSITIVE, buffer);
-TPM2B_MARSHAL(TPM2B_CONTEXT_DATA);
+// TPM2B_MARSHAL(TPM2B_CONTEXT_DATA);
 TPM2B_UNMARSHAL(TPM2B_CONTEXT_DATA, buffer);
 TPM2B_MARSHAL(TPM2B_NONCE);
 TPM2B_UNMARSHAL(TPM2B_NONCE, buffer);
@@ -315,3 +315,43 @@ TPM2B_MARSHAL_SUBTYPE(TPM2B_CREATION_DATA, TPMS_CREATION_DATA, creationData);
 TPM2B_UNMARSHAL_SUBTYPE(TPM2B_CREATION_DATA, TPMS_CREATION_DATA, creationData);
 TPM2B_MARSHAL_SUBTYPE(TPM2B_PUBLIC, TPMT_PUBLIC, publicArea);
 TPM2B_UNMARSHAL_SUBTYPE(TPM2B_PUBLIC, TPMT_PUBLIC, publicArea);
+
+TSS2_RC Tss2_MU_TPM2B_CONTEXT_DATA_Marshal(TPM2B_CONTEXT_DATA const *src, uint8_t buffer[], size_t buffer_size, size_t *offset) {
+    size_t  local_offset = 0;
+    TSS2_RC rc;
+    if (src == NULL) {
+        LOG_WARNING("src param is NULL");
+        return TSS2_MU_RC_BAD_REFERENCE;
+    }
+    if (offset != NULL) {
+        LOG_DEBUG("offset non-NULL, initial value: %zu", *offset);
+        local_offset = *offset;
+    }
+    if (buffer == NULL && offset == NULL) {
+        LOG_WARNING("buffer and offset parameter are NULL");
+        return TSS2_MU_RC_BAD_REFERENCE;
+    } else if (buffer == NULL && offset != NULL) {
+        *offset += sizeof(UINT16) + src->size;
+        LOG_TRACE("buffer NULL and offset non-NULL, updating offset to %zu", *offset);
+        return TSS2_RC_SUCCESS;
+    } else if (buffer_size < local_offset || buffer_size - local_offset < (sizeof(UINT16) + src->size)) {
+        LOG_DEBUG("buffer_size: %zu with offset: %zu are insufficient for object of size %zu",
+                  buffer_size, local_offset, sizeof(UINT16) + src->size);
+        return TSS2_MU_RC_INSUFFICIENT_BUFFER;
+    } else if ((sizeof(TPM2B_CONTEXT_DATA) - sizeof(src->size)) < src->size) {
+        LOG_WARNING("size: %u for buffer of TPM2B_CONTEXT_DATA is larger than max length of buffer: %zu",
+                    src->size, (sizeof(TPM2B_CONTEXT_DATA) - sizeof(src->size)));
+        return TSS2_MU_RC_BAD_SIZE;
+    }
+    LOG_DEBUG("Marshalling TPM2B_CONTEXT_DATA from 0x%" PRIxPTR " to buffer 0x%" PRIxPTR
+              " at index 0x%zx, buffer size %zu, object size %u",
+              (uintptr_t) & src, (uintptr_t)buffer, local_offset, buffer_size, src->size);
+    rc = Tss2_MU_UINT16_Marshal(src->size, buffer, buffer_size, &local_offset);
+    if (rc) return rc;
+    if (src->size) {
+        memcpy(&buffer[local_offset], src->buffer, src->size);
+        local_offset += src->size;
+    }
+    if (offset != NULL) *offset = local_offset;
+    return TSS2_RC_SUCCESS;
+}

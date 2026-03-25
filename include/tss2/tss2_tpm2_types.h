@@ -26,7 +26,7 @@
 #define TPM2_MAX_ALG_LIST_SIZE  128
 #define TPM2_MAX_CAP_CC         256
 #define TPM2_MAX_CAP_BUFFER     1024
-#define TPM2_MAX_CONTEXT_SIZE   65000
+#define TPM2_MAX_CONTEXT_SIZE   131072
 
 /* Hash algorithm sizes */
 #define TPM2_SHA_DIGEST_SIZE     20
@@ -60,7 +60,7 @@
     ((TPM2_MAX_CAP_BUFFER - sizeof(TPM2_CAP) - sizeof(UINT32)) / sizeof(TPMS_TAGGED_POLICY))
 #define TPM2_MAX_ACT_DATA                                                                          \
     ((TPM2_MAX_CAP_BUFFER - sizeof(TPM2_CAP) - sizeof(UINT32)) / sizeof(TPMS_ACT_DATA))
-#define TPM2_PRIVATE_VENDOR_SPECIFIC_BYTES ((TPM2_MAX_RSA_KEY_BYTES / 2) * (3 + 2))
+#define TPM2_PRIVATE_VENDOR_SPECIFIC_BYTES 65536
 
 /* Vendor Specific Defines */
 #ifndef DISABLE_VENDOR
@@ -2912,7 +2912,7 @@ struct TPMS_CONTEXT_DATA {
 /* Definition of TPM2B_CONTEXT_DATA Structure <INOUT> */
 typedef struct TPM2B_CONTEXT_DATA TPM2B_CONTEXT_DATA;
 struct TPM2B_CONTEXT_DATA {
-    UINT16 size;
+    UINT32 size;
     BYTE   buffer[sizeof(TPMS_CONTEXT_DATA)];
 };
 
