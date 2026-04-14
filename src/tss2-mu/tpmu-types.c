@@ -1069,10 +1069,10 @@ TPMU_MARSHAL2(TPMU_PUBLIC_PARMS,
               ADDR,
               asymDetail,
               Tss2_MU_TPMS_ASYM_PARMS_Marshal,
-              TPM2_ALG_AIGIS_SIG,
-              ADDR,
-              asymDetail,
-              Tss2_MU_TPMS_ASYM_PARMS_Marshal)
+              TPM2_ALG_AIGIS_SIG, ADDR, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Marshal,
+              TPM2_ALG_MLDSA_44, ADDR, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Marshal,
+              TPM2_ALG_MLDSA_65, ADDR, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Marshal,
+              TPM2_ALG_MLDSA_87, ADDR, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Marshal)
 TPMU_UNMARSHAL2(TPMU_PUBLIC_PARMS,
                 TPM2_ALG_KEYEDHASH,
                 keyedHashDetail,
@@ -1095,9 +1095,10 @@ TPMU_UNMARSHAL2(TPMU_PUBLIC_PARMS,
                 TPM2_ALG_SCLOUDPLUS_L5,
                 asymDetail,
                 Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
-                TPM2_ALG_AIGIS_SIG,
-                asymDetail,
-                Tss2_MU_TPMS_ASYM_PARMS_Unmarshal)
+                TPM2_ALG_AIGIS_SIG, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
+                TPM2_ALG_MLDSA_44, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
+                TPM2_ALG_MLDSA_65, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Unmarshal,
+                TPM2_ALG_MLDSA_87, asymDetail, Tss2_MU_TPMS_ASYM_PARMS_Unmarshal)
 
 TPMU_MARSHAL2(TPMU_NAME,
               sizeof(TPM2_HANDLE),
