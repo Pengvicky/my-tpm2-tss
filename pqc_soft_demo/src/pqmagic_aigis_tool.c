@@ -24,6 +24,11 @@ typedef struct {
     AigisVerifyFn verify;
 } AigisFns;
 
+static uint16_t read_be16(const uint8_t *buf)
+{
+    return (uint16_t)(((uint16_t)buf[0] << 8) | (uint16_t)buf[1]);
+}
+
 static int streq(const char *lhs, const char *rhs)
 {
     return lhs != NULL && rhs != NULL && strcmp(lhs, rhs) == 0;
@@ -83,6 +88,41 @@ static const PqAlgInfo *resolve_mode(const char *mode_text, size_t key_len, int 
         return pq_alg_info_from_aigis_secret_key_size(key_len);
     }
     return pq_alg_info_from_aigis_public_key_size(key_len);
+}
+
+static int maybe_unwrap_tpm_signature(const PqAlgInfo *alg_info,
+    uint8_t **signature,
+    size_t *signature_len)
+{
+    uint16_t sig_alg;
+    uint16_t wrapped_len;
+    uint8_t *raw_signature;
+
+    if (alg_info == NULL || signature == NULL || signature_len == NULL || *signature == NULL) {
+        return -1;
+    }
+    if (*signature_len == alg_info->signature_bytes) {
+        return 0;
+    }
+    if (*signature_len != alg_info->signature_bytes + 4) {
+        return 0;
+    }
+
+    sig_alg = read_be16(*signature);
+    wrapped_len = read_be16(*signature + 2);
+    if (sig_alg != alg_info->tpm_type || wrapped_len != alg_info->signature_bytes) {
+        return 0;
+    }
+
+    raw_signature = malloc(alg_info->signature_bytes);
+    if (raw_signature == NULL) {
+        return -1;
+    }
+    memcpy(raw_signature, *signature + 4, alg_info->signature_bytes);
+    free(*signature);
+    *signature = raw_signature;
+    *signature_len = alg_info->signature_bytes;
+    return 1;
 }
 
 static int cmd_keygen(int argc, char **argv)
@@ -322,6 +362,13 @@ static int cmd_verify(int argc, char **argv)
     if (alg_info == NULL) {
         fprintf(stderr, "unable to resolve AIGIS mode for public key length %zu\n", public_key_len);
         goto out;
+    }
+    ret = maybe_unwrap_tpm_signature(alg_info, &signature, &signature_len);
+    if (ret < 0) {
+        goto out;
+    }
+    if (ret > 0) {
+        fprintf(stderr, "detected TPM/TCM-wrapped %s signature, stripped 4-byte header\n", alg_info->name);
     }
     if (signature_len != alg_info->signature_bytes) {
         fprintf(stderr, "signature length %zu does not match %s (%zu)\n",
